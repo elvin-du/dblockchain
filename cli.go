@@ -17,8 +17,18 @@ func (cli *CLI) Run() {
 
 	addBlockData := addBlockCmd.String("data", "", "Block Data")
 
+	if 2 > len(os.Args) {
+		cli.printUseage()
+		os.Exit(1)
+	}
+
 	switch os.Args[1] {
 	case "addblock":
+		if 4 > len(os.Args) {
+			cli.printUseage()
+			os.Exit(1)
+		}
+
 		err := addBlockCmd.Parse(os.Args[2:])
 		if nil != err {
 			log.Printf("parse add block command failed,err:%s", err.Error())
@@ -73,6 +83,12 @@ func (cli *CLI) printChain() {
 	}
 }
 
-func (cli *CLI) printUseage() string {
-	return ""
+func (cli *CLI) printUseage() {
+	useage := `userage:  dblockchain <command> [<args>]
+				
+	addblock 		add data into block
+		-data             block data
+	printchain 		print all blocks`
+
+	log.Printf("%+v", useage)
 }
