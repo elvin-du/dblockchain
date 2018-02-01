@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	dbFile       = "blocks.db"
-	blocksBucket = "blocksBucket"
+	dbFile              = "blocks.db"
+	blocksBucket        = "blocksBucket"
+	genesisCoinbaseData = "elvin du learning blockchain in 2018"
 )
 
 type BlockChain struct {
@@ -17,7 +18,7 @@ type BlockChain struct {
 	lastBlockHash []byte
 }
 
-func NewBlockChain() (*BlockChain, error) {
+func NewBlockChain(address string) (*BlockChain, error) {
 	var lbh []byte
 
 	db, err := bolt.Open(dbFile, 0600, nil)
@@ -33,7 +34,8 @@ func NewBlockChain() (*BlockChain, error) {
 
 		if nil == b {
 			log.Printf("bucket(%s) not found, so create a bucket and new genesis block", blocksBucket)
-			genesis := NewGenesisBlock()
+			cbtx := NewCoinbaseTX(address, genesisCoinbaseData)
+			genesis := NewGenesisBlock(cbtx)
 			log.Printf("new genesis block success")
 			b, err := tx.CreateBucket([]byte(blocksBucket))
 			if nil != err {

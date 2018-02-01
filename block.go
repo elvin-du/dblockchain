@@ -11,16 +11,16 @@ import (
 
 type Block struct {
 	Timestamp     int64
-	Data          []byte
+	Transactions  []*Transaction
 	PrevBlockHash []byte
 	Hash          []byte
 	Nonce         int
 }
 
-func NewBlock(data string, prevBlockHash []byte) *Block {
+func NewBlock(transactions []*Transaction, prevBlockHash []byte) *Block {
 	block := &Block{
 		time.Now().Unix(),
-		[]byte(data),
+		transactions,
 		prevBlockHash,
 		[]byte{},
 		0,
@@ -36,8 +36,8 @@ func NewBlock(data string, prevBlockHash []byte) *Block {
 	return block
 }
 
-func NewGenesisBlock() *Block {
-	return NewBlock("Genesis Block", []byte{})
+func NewGenesisBlock(coinbase *Transaction) *Block {
+	return NewBlock([]*Transaction{coinbase}, []byte{})
 }
 
 func DeserializeBlock(b []byte) (*Block, error) {
@@ -72,4 +72,17 @@ func (b *Block) Serialize() ([]byte, error) {
 	}
 
 	return buffer.Bytes(), nil
+}
+
+func (b *Block) HashTransactions() []byte {
+	var txHashes [][]byte
+	var txHash [32]byte
+
+	for _, tx := range b.Transactions {
+		txHashes = append(txHashes, tx.ID)
+	}
+
+	txHash = sha256.Sum256(bytes.Join(txHashes, []byte{}))
+
+	return txHash[:]
 }
