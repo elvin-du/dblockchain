@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"strconv"
 )
 
 func init() {
@@ -10,16 +9,13 @@ func init() {
 }
 
 func main() {
-	bc := NewBlockChain()
-	bc.AddBlock("Send 1 BTC to Elvin")
-	bc.AddBlock("Send 2 more BTC to Elvin")
-
-	for _, block := range bc.blocks {
-		log.Printf("Prev. hash: %x\n", block.PrevBlockHash)
-		log.Printf("Data. %s\n", block.Data)
-		log.Printf("Hash. %x\n", block.Hash)
-
-		pow := NewProofOfWork(block)
-		log.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
+	bc, err := NewBlockChain()
+	if nil != err {
+		log.Printf("new blockchain failed,err:%s", err.Error())
+		return
 	}
+	defer bc.db.Close()
+
+	cli := CLI{bc}
+	cli.Run()
 }
